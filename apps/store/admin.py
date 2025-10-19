@@ -1,4 +1,4 @@
-from typing import Any, List, Tuple, Optional
+from typing import Any, List, Tuple
 from django.contrib import admin, messages
 from django.db.models import Model, QuerySet, Count
 from django.http import HttpRequest
@@ -28,6 +28,7 @@ class InventoryFilter(admin.SimpleListFilter):
 @admin.register(models.Collection)
 class CollectionAdmin(admin.ModelAdmin):
     list_display = ['title', 'products_count']
+    search_fields = ['title']
 
     @admin.display(ordering='products_count')
     def products_count(self, collection : Model) -> int:
@@ -43,8 +44,14 @@ class CollectionAdmin(admin.ModelAdmin):
             products_count=Count('product')
         )
 
+
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
+    autocomplete_fields = ['collection']
+    prepopulated_fields = {
+        'slug' : ['title']
+    }
+    search_fields = ['title']
     actions = ['clear_inventory']
     list_display = ['title', 'unit_price', 'inventory_status', 
                     'collection_title']
@@ -97,8 +104,17 @@ class CustomerAdmin(admin.ModelAdmin):
         )
 
 
+class OrderItemInline(admin.TabularInline):
+    min_num = 1
+    autocomplete_fields = ['product']
+    model = models.OrderItem
+    extra = 0
+
+
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
+    autocomplete_fields = ['customer']
+    inlines = [OrderItemInline]
     list_display = ['id', 'placed_at', 'customer']
     list_per_page = 10
     ordering = ['customer__first_name', 'customer__last_name']

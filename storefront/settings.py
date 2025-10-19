@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "phonenumber_field",
     'apps.playground',
     'apps.store',
+    'apps.store_custom',
     'apps.tags',
     'apps.likes'
 ]
