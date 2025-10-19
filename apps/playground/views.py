@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-
-def calc():
-    x = 1
-    y = 2
-    return x
+from django.db.models import Avg, Max, Min, Count, Sum
+from ..store.models import Product, Customer, Collection, Order, OrderItem
 
 # Create your views here.
-def say_hello(request):
-    x = calc()
-    return render(request, 'hello.html', {'name' : 'Ben'})
+def say_hello(request) -> HttpResponse:
+    queryset = Product.objects.all()
+    
+    return render(request, 'hello.html', 
+                  {'name' : 'Django',
+                   'product': queryset})

@@ -3,9 +3,10 @@ from phonenumber_field.modelfields import PhoneNumberField
 from datetime import date, timedelta
 
 # Create your models here.
-class Promotions(models.Model):
+class Promotion(models.Model):
     description = models.CharField(max_length=255)
     discount = models.FloatField()
+
 
 class Collection(models.Model):
     title = models.CharField(max_length=255)
@@ -15,6 +16,12 @@ class Collection(models.Model):
         null=True,
         related_name='+'
     )
+
+    def __str__(self) -> str:
+        return self.title
+    
+    class Meta:
+        ordering = ['title']
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
@@ -26,12 +33,20 @@ class Product(models.Model):
     collection = models.ForeignKey(
         Collection,
         on_delete=models.PROTECT)
-    promotions = models.ManyToManyField(Promotions)
+    promotion = models.ManyToManyField(Promotion, blank=True)
+
+    def __str__(self) -> str:
+        return self.title
+    
+    class Meta():
+        ordering = ['title']
+
 
 class Customer(models.Model):
     MEMBERSHIP_BRONZE = 'B'
     MEMBERSHIP_SILVER = 'S'
     MEMBERSHIP_GOLD = 'G'
+
     MEMBERSHIP_CHOICES = [
         (MEMBERSHIP_BRONZE, 'Bronze'),
         (MEMBERSHIP_SILVER, 'Silver'),
@@ -39,44 +54,36 @@ class Customer(models.Model):
     ]
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    email = models.EmailField(
-        unique=True, 
-        help_text='Please enter a valid email address'
-        )
-    phone = PhoneNumberField(max_length=40)
-    birth_date = models.DateField(
-        default=date.today() - timedelta(days=365*20), 
-        null=True
-        )
-    membership = models.CharField(
-        choices=MEMBERSHIP_CHOICES, 
-        max_length=1,
-        default=MEMBERSHIP_BRONZE
-        )
+    email = models.EmailField(unique=True, 
+                              help_text='Please enter a valid email address')
+    phone = PhoneNumberField(max_length=255)
+    birth_date = models.DateField(null=True, blank=True)
+    membership = models.CharField(max_length=1,
+                                  choices=MEMBERSHIP_CHOICES,
+                                  default=MEMBERSHIP_BRONZE)
     
-class Address(models.Model):
-    street = models.CharField(max_length=255)
-    city = models.CharField(max_length=255)
-    customer = models.OneToOneField(
-        Customer, 
-        on_delete=models.CASCADE,
-        primary_key=True
-        )
+    def __str__(self) -> str:
+        return f'{self.first_name} {self.last_name}'
     
+    class Meta:
+        ordering = ['first_name', 'last_name']
+    
+
 class Order(models.Model):
-    STATUS_PENDING = 'P'
-    STATUS_COMPLETE = 'C'
-    STATUS_FAILED = 'F'
-    STATUS_CHOICES = [
-        (STATUS_PENDING, 'Pending'),
-        (STATUS_COMPLETE, 'Complete'),
-        (STATUS_FAILED, 'Failed')
+    PAYMENT_STATUS_PENDING = 'P'
+    PAYMENT_STATUS_COMPLETE = 'C'
+    PAYMENT_STATUS_FAILED = 'F'
+    PAYMENT_STATUS_CHOICES = [
+        (PAYMENT_STATUS_PENDING, 'Pending'),
+        (PAYMENT_STATUS_COMPLETE, 'Complete'),
+        (PAYMENT_STATUS_FAILED, 'Failed')
     ]
     placed_at = models.DateTimeField(auto_now_add=True)
-    payment_status = models.CharField(max_length=1, 
-                                      choices=STATUS_CHOICES, 
-                                      default=STATUS_PENDING)
+    payment_status = models.CharField(max_length=1,
+                                      choices=PAYMENT_STATUS_CHOICES,
+                                      default=PAYMENT_STATUS_PENDING)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.PROTECT)
@@ -84,10 +91,20 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
 
+
+class Address(models.Model):
+    street = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+    zip = models.CharField(max_length=255, null=True)
+    customer = models.OneToOneField(Customer, 
+                                    on_delete=models.CASCADE)
+
+
 class Cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
+
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
-    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
