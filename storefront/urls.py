@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from .settings import DEBUG, argv, environ
 
 admin.site.site_header = "Storefront Admin"
 admin.site.site_title = "Storefront Admin Portal"
@@ -24,5 +25,11 @@ admin.site.index_title = "Welcome to Storefront Admin Portal"
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('playground/', include('apps.playground.urls')),
-    path('__debug__/', include('debug_toolbar.urls')),
+    path('store/', include('apps.store.urls'))
 ]
+
+# add debug toolbar
+TESTING = "test" in argv or "PYTEST_VERSION" in environ
+
+if not TESTING and DEBUG: 
+    urlpatterns.append(path('__debug__/', include('debug_toolbar.urls')))

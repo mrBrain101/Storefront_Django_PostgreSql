@@ -27,7 +27,7 @@ class InventoryFilter(admin.SimpleListFilter):
 
 @admin.register(models.Collection)
 class CollectionAdmin(admin.ModelAdmin):
-    list_display = ['title', 'products_count']
+    list_display = ['id','title', 'products_count']
     search_fields = ['title']
 
     @admin.display(ordering='products_count')
@@ -35,7 +35,7 @@ class CollectionAdmin(admin.ModelAdmin):
         url = reverse('admin:store_product_changelist')
         url += '?'
         url += urlencode({'collection__id' : str(collection.id)})
-        return format_html('<a href="{}">{}<a>', 
+        return format_html('<a href="{}">{} Products<a>', 
                            url,
                            collection.products_count)
         

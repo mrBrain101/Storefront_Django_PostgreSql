@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-pq_95d_p%cok%2%mw$**q*#u9ohr7f9dcohtu5c=ghukj+(qlc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
 
 
 # Application definition
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     "phonenumber_field",
     'apps.playground',
     'apps.store',
@@ -143,6 +144,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'COERCE_DECIMAL_TO_STRING': False
+}
 
 # Only enable the toolbar when we're in debug mode and we're
 # not running tests. Django will change DEBUG to be False for
