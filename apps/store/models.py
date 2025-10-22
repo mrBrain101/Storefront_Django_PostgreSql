@@ -1,3 +1,4 @@
+from uuid import uuid4
 from django.db import models
 from django.core.validators import MinValueValidator
 from phonenumber_field.modelfields import PhoneNumberField
@@ -99,7 +100,8 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
-    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='orderitems')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, 
+                                related_name='orderitems')
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
 
 
@@ -111,6 +113,7 @@ class Address(models.Model):
 
 
 class Cart(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
