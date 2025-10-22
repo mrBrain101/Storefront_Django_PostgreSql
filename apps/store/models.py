@@ -1,9 +1,8 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from phonenumber_field.modelfields import PhoneNumberField
-from datetime import date, timedelta
 
-# Create your models here.
+
 class Promotion(models.Model):
     description = models.CharField(max_length=255)
     discount = models.FloatField()
@@ -24,6 +23,7 @@ class Collection(models.Model):
     class Meta:
         ordering = ['title']
 
+
 class Product(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField()
@@ -43,6 +43,14 @@ class Product(models.Model):
     
     class Meta():
         ordering = ['title']
+
+
+class Review(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, 
+                                related_name='reviews')
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    date = models.DateField(auto_now_add=True)
 
 
 class Customer(models.Model):
