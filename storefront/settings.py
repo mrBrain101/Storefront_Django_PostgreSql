@@ -44,9 +44,9 @@ INSTALLED_APPS = [
     "phonenumber_field",
     'apps.playground',
     'apps.store',
-    'apps.store_custom',
     'apps.tags',
-    'apps.likes'
+    'apps.likes',
+    'apps.core'
 ]
 
 MIDDLEWARE = [
@@ -149,6 +149,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'COERCE_DECIMAL_TO_STRING': False
 }
+
+AUTH_USER_MODEL = "core.User"
 
 # Only enable the toolbar when we're in debug mode and we're
 # not running tests. Django will change DEBUG to be False for
