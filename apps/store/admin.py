@@ -118,7 +118,7 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline]
     list_display = ['id', 'placed_at', 'customer']
     list_per_page = 10
-    ordering = ['customer__first_name', 'customer__last_name']
+    ordering = ['customer__user__first_name', 'customer__user__last_name']
 
 
 @admin.register(models.Address)

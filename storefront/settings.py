@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 from os import environ
 from sys import argv
@@ -27,6 +28,7 @@ SECRET_KEY = 'django-insecure-pq_95d_p%cok%2%mw$**q*#u9ohr7f9dcohtu5c=ghukj+(qlc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# For local development with .pgpass and service files
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
 
 
@@ -41,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_filters',
     'rest_framework',
-    "phonenumber_field",
+    'djoser',
+    'phonenumber_field',
     'apps.playground',
     'apps.store',
     'apps.tags',
@@ -59,7 +62,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# debug toolbar
+# Debug toolbar
 INTERNAL_IPS = [
     # ...
     "127.0.0.1"
@@ -89,14 +92,11 @@ WSGI_APPLICATION = 'storefront.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# Service file path for Windows and PostgreSQL: 
+# "%APPDATA%\postgresql\.pg_service.conf"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "storefront",
-        "HOST" : "",
-        "USER" : "",
-        "PASSWORD" : "",
-        "PORT" : "",
         "OPTIONS": {
             "service" : "storefront_service",
             "passfile" : "../.pgpass"
@@ -147,11 +147,29 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'COERCE_DECIMAL_TO_STRING': False
+    'COERCE_DECIMAL_TO_STRING': False,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+# Simple JWT for DJOSER and DRF auth
+SIMPLE_JWT = {
+   'AUTH_HEADER_TYPES': ('JWT',),
+   'ACCESS_TOKEN_LIFETIME': timedelta(days=1)
+}
+
+# DJOSER
+DJOSER = {
+    'SERIALIZERS': {
+        'user_create': 'apps.core.serializers.UserCreateSerializer',
+        'current_user': 'apps.core.serializers.UserSerializer',
+    }
 }
 
 AUTH_USER_MODEL = "core.User"
 
+# Debug toolbar
 # Only enable the toolbar when we're in debug mode and we're
 # not running tests. Django will change DEBUG to be False for
 # tests, so we can't rely on DEBUG alone.

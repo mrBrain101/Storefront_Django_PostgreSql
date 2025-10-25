@@ -25,7 +25,9 @@ admin.site.index_title = "Welcome to Storefront Admin Portal"
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('playground/', include('apps.playground.urls')),
-    path('store/', include('apps.store.urls'))
+    path('store/', include('apps.store.urls')),
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt')),
 ]
 
 # add debug toolbar
