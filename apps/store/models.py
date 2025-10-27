@@ -5,6 +5,8 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from phonenumber_field.modelfields import PhoneNumberField
 
+from apps.store.validators import validate_file_size
+
 
 class Promotion(models.Model):
     description = models.CharField(max_length=255)
@@ -46,6 +48,14 @@ class Product(models.Model):
     
     class Meta():
         ordering = ['title']
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, 
+                                related_name='images')
+    image = models.ImageField(upload_to='store/images', 
+                              null=True, blank=True,
+                              validators=[validate_file_size])
 
 
 class Review(models.Model):

@@ -1,7 +1,8 @@
 from django.urls import path
-from . import views
+from .views import HelloView
 
 #URLConf - url config for an app
+
 urlpatterns = [
-    path('hello/', views.say_hello),
+    path('', HelloView.as_view(), name='hello'),
 ]

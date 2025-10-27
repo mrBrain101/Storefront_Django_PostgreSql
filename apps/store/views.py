@@ -12,8 +12,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from .permissions import IsAdminOrReadOnly, ViewCustomerHistoryPermission
-from .models import Customer, Order, Product, Collection, OrderItem, Review, Cart, CartItem
-from .serializers import (CreateOrderSerializer, CustomerSerializer, OrderSerializer, ProductSerializer, 
+from .models import Customer, Order, Product, Collection, OrderItem, ProductImage, Review, Cart, CartItem
+from .serializers import (CreateOrderSerializer, CustomerSerializer, OrderSerializer, ProductImageSerializer, ProductSerializer, 
                           CollectionSerializer, 
                           ReviewSerializer, 
                           CartSerializer, 
@@ -41,7 +41,7 @@ class CollectionViewSet(ModelViewSet):
 
 
 class ProductViewSet(ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.prefetch_related('images').all()
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = {'unit_price' : ['exact', 'gt', 'lt'], 
@@ -62,6 +62,17 @@ class ProductViewSet(ModelViewSet):
                             status=status.HTTP_405_METHOD_NOT_ALLOWED)
         
         return super().destroy(request, *args, **kwargs)
+
+
+class ProductImageViewSet(ModelViewSet):
+    serializer_class = ProductImageSerializer
+
+    def get_serializer_context(self):
+        return {'product_id': self.kwargs['product_pk']}
+    
+    def get_queryset(self):
+        return (ProductImage.objects
+                .filter(product_id=self.kwargs['product_pk']))
 
 
 class ReviewViewSet(ModelViewSet):
@@ -112,7 +123,8 @@ class CustomerViewSet(ModelViewSet):
         serializer = CustomerSerializer(customer)
         return Response(serializer.data)
     
-    @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['GET', 'PUT'], 
+            permission_classes=[IsAuthenticated])
     def me(self, request : HttpRequest) -> Response:
         customer = Customer.objects.get(user_id=request.user.id)
         if request.method == 'GET':

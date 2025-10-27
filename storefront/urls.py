@@ -14,24 +14,32 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
-from .settings import DEBUG, argv, environ
+from sys import argv
+from os import environ
 
 admin.site.site_header = "Storefront Admin"
 admin.site.site_title = "Storefront Admin Portal"
 admin.site.index_title = "Welcome to Storefront Admin Portal"
 
 urlpatterns = [
+    path('', include('apps.core.urls')),
     path('admin/', admin.site.urls),
     path('playground/', include('apps.playground.urls')),
     path('store/', include('apps.store.urls')),
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
-]
+] 
 
 # add debug toolbar
 TESTING = "test" in argv or "PYTEST_VERSION" in environ
 
-if not TESTING and DEBUG: 
+if not TESTING and settings.DEBUG: 
     urlpatterns.append(path('__debug__/', include('debug_toolbar.urls')))
+    urlpatterns += static(settings.MEDIA_URL, 
+                          document_root=settings.MEDIA_ROOT)
+if not TESTING and settings.DEBUG and settings.PROFILING:
+    urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]

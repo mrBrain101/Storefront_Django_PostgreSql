@@ -1,4 +1,9 @@
+.venv
 .vscode
 __pycache__/
-TODO.txt
+TODO.md
 scratchpad.md
+/static/
+*.log
+static
+templates
