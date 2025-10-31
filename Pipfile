@@ -45,6 +45,7 @@ virtualenv = "==20.35.3"
 whitenoise = "*"
 gunicorn = "*"
 waitress = "*"
+python-dotenv = "*"
 
 [dev-packages]
 pytest = "*"

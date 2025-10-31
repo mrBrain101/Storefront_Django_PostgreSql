@@ -12,13 +12,13 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from .permissions import IsAdminOrReadOnly, ViewCustomerHistoryPermission
-from .models import Customer, Order, Product, Collection, OrderItem, ProductImage, Review, Cart, CartItem
-from .serializers import (CreateOrderSerializer, CustomerSerializer, OrderSerializer, ProductImageSerializer, ProductSerializer, 
-                          CollectionSerializer, 
-                          ReviewSerializer, 
-                          CartSerializer, 
-                          CartItemSerializer,
-                          AddCartItemSerializer,
+from .models import (Customer, Order, Product, Collection, OrderItem, 
+                     ProductImage, Review, Cart, CartItem)
+from .serializers import (CreateOrderSerializer, CustomerSerializer, 
+                          OrderSerializer, ProductImageSerializer, 
+                          ProductSerializer, CollectionSerializer, 
+                          ReviewSerializer, CartSerializer, 
+                          CartItemSerializer, AddCartItemSerializer,
                           UpdateCartItemSerializer, UpdateOrderSerializer)
 from .pagination import CustomPageNumberPagination
 

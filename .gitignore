@@ -1,9 +1,11 @@
 .venv
 .vscode
 __pycache__/
-TODO.md
-scratchpad.md
 /static/
-*.log
 static
 templates
+.env
+*.log
+.devcontainer/.bash_history
+.devcontainer/commandhistory/
+.pytest_cache

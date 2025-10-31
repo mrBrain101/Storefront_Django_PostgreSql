@@ -1,0 +1,17 @@
+services:
+  django_web:
+    volumes:
+      - ..:/app:cached
+      - devcontainer-bashhistory:/commandhistory
+      - django_media:/app/media
+      - django_static:/app/static
+    command: sleep infinity
+    environment:
+      - HISTFILE=/commandhistory/.bash_history
+      - DJANGO_SETTINGS_MODULE=storefront.settings.dev
+      - PYTHONDONTWRITEBYTECODE=1
+
+volumes:
+  devcontainer-bashhistory:
+  django_media:
+  django_static:

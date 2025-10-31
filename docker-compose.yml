@@ -1,0 +1,204 @@
+name: storefront_django_pgsql
+services:
+  postgres_db:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      PGDATA: /var/lib/postgresql/data
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME} -d ${DATABASE_NAME}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    ports:
+      - '5432:5432'
+    restart: always
+    volumes:
+      - postgres_db_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 3G
+        reservations:
+          memory: 512M
+
+  django_web:
+    build: .
+    env_file:
+     - .env
+    environment:
+      DEBUG: ${DEBUG}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DJANGO_LOGLEVEL: ${DJANGO_LOGLEVEL}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+      DATABASE_ENGINE: ${DATABASE_ENGINE}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      POPULATE_DB: ${POPULATE_DB}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: 5432
+      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE}
+      PYTHONUNBUFFERED: 1
+    entrypoint: ["/bin/bash", "/app/wait-for-it.sh", "postgres_db:5432", "--", "/app/docker-entrypoint.sh"]
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/store/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    ports:
+      - "8000:8000"
+    volumes:
+      - django_media:/app/media
+      - django_static:/app/static
+    restart: on-failure:3
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 1G
+
+  django_waitress:
+    build: .
+    env_file:
+     - .env
+    environment:
+      DEBUG: ${DEBUG}
+      SILK_PROFILING: ${SILK_PROFILING}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DJANGO_LOGLEVEL: ${DJANGO_LOGLEVEL}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+      DATABASE_ENGINE: ${DATABASE_ENGINE}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      POPULATE_DB: ${POPULATE_DB}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: 5432
+      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE}
+      PYTHONUNBUFFERED: 1
+    entrypoint: ["/bin/bash", "/app/wait-for-it.sh", "postgres_db:5432", "--"]
+    command: python /app/server.py
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/store/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    ports:
+      - "8001:8000"
+    volumes:
+      - django_media:/app/media
+      - django_static:/app/static
+    restart: on-failure:3
+    profiles:
+      - production
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 1G
+
+  locust_master:
+    image: locustio/locust:2.20.0
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./locustfiles:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --master --master-bind-port=5557
+    environment:
+      - LOCUST_HOST=http://django_web:8000
+    profiles:
+      - loadtest
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 256M
+
+  locust_worker:
+    image: locustio/locust:2.20.0
+    volumes:
+      - ./locustfiles:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --worker --master-host=locust_master --master-port=5557
+    depends_on:
+      - locust_master
+    profiles:
+      - loadtest
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+
+  silk:
+    build: .
+    environment:
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: 5432
+    volumes:
+      - .:/app/silk_data/
+    ports:
+      - "8001:8000"
+    depends_on:
+      - django_web
+    profiles:
+      - silk
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  smtp4dev:
+    image: rnwood/smtp4dev:v3
+    ports:
+      - "5000:80"
+      - "25:25"
+    restart: on-failure
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  tests:
+    build: .
+    env_file:
+     - .env
+    environment:
+      DJANGO_SETTINGS_MODULE: storefront.settings.test
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: 5432
+      POPULATE_DB: false
+    entrypoint: ["/bin/bash", "/app/wait-for-it.sh", "postgres_db:5432", "--", "pytest"]
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    profiles:
+      - test
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+
+volumes:
+  postgres_db_data:
+  django_media:
+  django_static:
