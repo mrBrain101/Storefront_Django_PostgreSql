@@ -14,9 +14,7 @@ logger = logging.getLogger(__name__)
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Set Django settings module
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 
-                      os.getenv('DJANGO_SETTINGS_MODULE', 
-                                'storefront.settings.dev'))
+os.environ.setdefault('DJANGO_SETTINGS_MODULE')
 
 # Import Django WSGI application
 try:

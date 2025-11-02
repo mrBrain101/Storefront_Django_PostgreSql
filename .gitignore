@@ -1,8 +1,8 @@
 .venv
 __pycache__/
-/static/
-static
-templates
+/media
+/static
+/templates
 .env
 *.log
 .devcontainer/.bash_history

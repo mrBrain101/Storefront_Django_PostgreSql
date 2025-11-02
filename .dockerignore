@@ -1,7 +1,9 @@
 LICENSE
 *.log
 
+.git
 **/__pycache__
+**/.pytest_cache
 **/.venv
 **/.classpath
 **/.dockerignore
@@ -26,3 +28,5 @@ LICENSE
 **/obj
 **/secrets.dev.yaml
 **/values.dev.yaml
+/static
+/media

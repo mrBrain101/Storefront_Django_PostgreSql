@@ -1,10 +1,11 @@
 from django.urls import path
+from django.shortcuts import render
+from rest_framework.reverse import reverse
 from rest_framework_nested import routers
 from . import views
 
 
 router = routers.DefaultRouter()
-# basename for generating view names
 router.register('products', views.ProductViewSet, basename='products')
 router.register('collections', views.CollectionViewSet)
 router.register('carts', views.CartViewSet)
@@ -23,4 +24,17 @@ carts_router = routers.NestedDefaultRouter(router, 'carts', lookup='cart')
 carts_router.register('items', views.CartItemViewSet, basename='carts-items')
 
 
-urlpatterns = router.urls + products_router.urls + carts_router.urls
+def custom_api_root(request, format=None):
+    return render(request, 'store/custom_root.html', {
+        'endpoints': {
+            'products': reverse('products-list', request=request, format=format),
+            'collections': reverse('collection-list', request=request, format=format),
+            'carts': reverse('cart-list', request=request, format=format),
+            'customers': reverse('customer-list', request=request, format=format),
+            'orders': reverse('orders-list', request=request, format=format)
+        }
+    })
+
+
+urlpatterns = [path('', custom_api_root, name='custom-root')]
+urlpatterns += router.urls + products_router.urls + carts_router.urls

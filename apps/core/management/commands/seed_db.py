@@ -10,7 +10,6 @@ class Command(BaseCommand):
     help = 'Populates the database with collections and products'
 
     def handle(self, *args, **options):
-        logger.info('Checking if population is enabled...')
         populate_db = os.getenv('POPULATE_DB', 'false').lower()
 
         if not populate_db == 'true':

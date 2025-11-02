@@ -3,6 +3,7 @@ import pytest
 from model_bakery import baker
 from apps.store.models import Collection
 
+
 @pytest.fixture
 def create_collection(api_client):
     def do_create_collection(collection):

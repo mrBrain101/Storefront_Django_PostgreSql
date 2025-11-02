@@ -21,6 +21,7 @@ from django.urls import path, include
 from sys import argv
 from os import environ
 
+
 admin.site.site_header = "Storefront Admin"
 admin.site.site_title = "Storefront Admin Portal"
 admin.site.index_title = "Welcome to Storefront Admin Portal"
@@ -34,12 +35,12 @@ urlpatterns = [
     path('auth/', include('djoser.urls.jwt')),
 ] 
 
-# add debug toolbar
 TESTING = "test" in argv or "PYTEST_VERSION" in environ
-
+# add debug toolbar
 if not TESTING and settings.DEBUG: 
     urlpatterns.append(path('__debug__/', include('debug_toolbar.urls')))
     urlpatterns += static(settings.MEDIA_URL, 
                           document_root=settings.MEDIA_ROOT)
-if not TESTING and settings.DEBUG and settings.PROFILING:
+# add silk profiling
+if not TESTING and settings.DEBUG and settings.SILK_PROFILING:
     urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]

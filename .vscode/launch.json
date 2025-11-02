@@ -13,7 +13,7 @@
                 "9000"
             ],
             "django": true,
-            "autoStartBrowser": true,
+            "autoStartBrowser": false,
             "program": "${workspaceFolder}\\manage.py"
         },
         {
@@ -29,7 +29,7 @@
             "django": true,
             "justMyCode": false,
             "env": {
-                "DJANGO_SETTINGS_MODULE": "storefront.settings.dev"
+                "DJANGO_SETTINGS_MODULE": "storefront.settings.test"
             },
             "console": "integratedTerminal"
         },
@@ -57,7 +57,7 @@
             "django": true,
             "justMyCode": false,
             "env": {
-                "DJANGO_SETTINGS_MODULE": "storefront.settings.prod"
+                "DJANGO_SETTINGS_MODULE": "storefront.settings.test"
             },
             "console": "integratedTerminal"
         }

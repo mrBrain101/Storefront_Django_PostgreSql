@@ -7,6 +7,8 @@ echo "=== Starting Django Application ==="
 sleep 2
 
 # Apply database migrations
+echo "Making database migrations..."
+python manage.py makemigrations --noinput
 echo "Applying database migrations..."
 python manage.py migrate --noinput
 

@@ -11,18 +11,19 @@ RUNNING_IN_CONTAINER = RUNNING_IN_CONTAINER == 'true'
 # DEBUG flag for development ONLY
 DEBUG = os.environ['DEBUG'].strip().lower() == 'true'
 # Set to True to enable profiling with silk in development
-PROFILING = os.environ['SILK_PROFILING'].strip().lower() == 'true'
+SILK_PROFILING = os.environ['SILK_PROFILING'].strip().lower() == 'true'
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# Get secret key
 try:
     SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 except:
     raise Exception('DJANGO_SECRET_KEY is not set in .env!')
 
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(",")
+
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 if RUNNING_IN_CONTAINER:
-    ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(",")
     DATABASES = {
         'default': {
             'ENGINE': os.environ.get("DATABASE_ENGINE"),
@@ -84,7 +85,7 @@ if not TESTING and DEBUG:
     }
 
 # Profiling with silk
-if not TESTING and DEBUG and PROFILING:
+if not TESTING and DEBUG and SILK_PROFILING:
     INSTALLED_APPS = [
         *INSTALLED_APPS,
         'silk'

@@ -1,0 +1,36 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Store Front API</title>
+    <link rel="stylesheet" href="{% static 'core/styles.css' %}" />
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1><img src="{% static 'core/logo.svg' %}", alt="Logo", class="logo_c">&nbsp;&nbsp;Demo Store Front API</h1> 
+      <p style="text-align: center">
+        An API for a demo store front with Django Rest Framework and PostgreSQL.
+      </p>
+
+      <h2>Available Endpoints</h2>
+      <ul>
+        <li><a href="/admin/">Admin Panel</a></li>
+        <li><a href="/auth/">Authentication</a></li>
+        <li><a href="/store/">Store API</a></li>
+        <li><a href="/playground/">Playground</a></li>
+      </ul>
+
+      <h2>Resources</h2>
+      <p style="text-align: center">
+        For more information, see the <a href="https://github.com/mrBrain101/Storefront_Django_PostgreSql/blob/a0e60930442e8f340bdb108c654170028c258b5c/README.en.md">README</a>
+      </p>
+
+      <div class="footer"><a href="https://github.com/mrBrain101/Storefront_Django_PostgreSql">GitHub repo</a></div>
+    </div>
+  </body>
+</html>

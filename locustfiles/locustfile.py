@@ -34,9 +34,15 @@ class WebsiteUser(HttpUser):
                          json={'product_id': product_id, 'quantity': 1})
     
     def on_start(self):
-        response = self.client.post('/store/carts/')
-        result = response.json()
-        self.cart_id = result['id']
+        with self.client.post('/store/carts/', catch_response=True) as response:
+            if response.status_code == 201:
+                result = response.json()
+                self.cart_id = result['id']
+                response.success()
+            else:
+                response.failure(
+                    f'Status: {response.status_code}, Body: {response.text}'
+                    )
 
 
 @events.test_start.add_listener
