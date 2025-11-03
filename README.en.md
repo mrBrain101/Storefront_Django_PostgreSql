@@ -1,4 +1,4 @@
-[![ru](https://img.shields.io/badge/lang-ru-red.svg)](README.ru.md)
+[![ru](https://img.shields.io/badge/lang-ru-red.svg)](README.md)
 
 # Store Front API
 This repository contains the source code for a demo store front with Django Rest Framework and PostgreSQL.
