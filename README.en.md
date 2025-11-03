@@ -20,7 +20,7 @@ This repository contains the source code for a demo store front with Django Rest
 - Silk: performance profiling
 - Waitress: production WSGI server
 
-# Planned Features
+# Possible Improvements
 - Celery: asynchronous task queue
 - Extended API documentation
 - Frontend: React.js
